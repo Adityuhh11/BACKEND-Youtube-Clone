@@ -7,3 +7,5 @@ const asynchandler = (requiredFunction) => async (req,res,next)=>{
         }
        
     }
+
+    export {asynchandler}
