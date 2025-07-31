@@ -38,17 +38,16 @@ const registerUser =  asynchandler(async(req,res)=>{
     throw new ApiError(409,"User with email or username aldready exists")
    }
 
-   const avatarLocalPath = req.files?.avatar[0]?.path;
-   const coverimageLocalPath = req.files?.coverimage?.[0]?.path;
-//    console.log(req.files)
+   const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverimage) && req.files.coverimage.length > 0) {
+    coverImageLocalPath = req.files.coverimage[0].path;
+    }
 
-   if (!avatarLocalPath) {
-     throw new ApiError(400, "Avatar is Required")
-   }
-   console.log("Uploading avatar from:", avatarLocalPath);
-   const normalizedAvatarPath = avatarLocalPath.replace(/\\/g, "/");
-   const avatar = await uploadOnCloudinary(normalizedAvatarPath);
-   const coverimage =await uploadOnCloudinary(coverimageLocalPath)
+//    const coverimageLocalPath = req.files?.coverimage?.[0]?.path;
+//    console.log(req.files)
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+   const coverimage =await uploadOnCloudinary(coverImageLocalPath)
 
    if (!avatar) {
        throw new ApiError(400, "Avatar upload failed")
