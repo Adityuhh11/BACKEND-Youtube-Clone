@@ -1,4 +1,5 @@
-const asynchandler = (requiredFunction) => async (req,res,next)=>{
+const asynchandler = (requiredFunction) => async (req,res,next)=>
+    {
         try {
              await requiredFunction(req,res,next);
         } catch (error) {
