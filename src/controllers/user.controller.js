@@ -3,7 +3,7 @@ import {ApiError} from "../utils/ApiError.js"
 import { User } from "../models/user.mode.js"
 import {uploadOnCloudinary} from "../utils/clouddinary.js"
 import {ApiResponse} from "../utils/ApiRespons.js"
-import verifyJWT from "../middlewares/auth.middleware.js"
+import {VerifyJWT} from "../middlewares/auth.middleware.js"
 
 const generateAccessTokenandRefreshToken =  async(userId)=>{
 

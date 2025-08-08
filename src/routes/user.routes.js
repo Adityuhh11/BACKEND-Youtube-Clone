@@ -1,10 +1,10 @@
 import {Router} from "express";
-import { logoutUser, registerUser } from "../controllers/user.controller.js";
+import { logoutUser, registerUser, loginUser } from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 const router =  Router()
-import { loginUser } from "../controllers/user.controller.js";
-import verifyJWT from "../middlewares/auth.middleware.js"
-import { logoutUser } from "../controllers/user.controller.js";
+import { VerifyJWT } from "../middlewares/auth.middleware.js";
+
+
 router.route("/register").post(
     upload.fields([
         {
@@ -22,7 +22,7 @@ router.route("/register").post(
 router.route("/login").post(loginUser)
 
 //secure route
-router.route("/logout").post(verifyJWT, logoutUser)
+router.route("/logout").post(VerifyJWT, logoutUser)
 
 
 export default router
