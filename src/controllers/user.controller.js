@@ -3,7 +3,7 @@ import {ApiError} from "../utils/ApiError.js"
 import { User } from "../models/user.mode.js"
 import {uploadOnCloudinary} from "../utils/clouddinary.js"
 import {ApiResponse} from "../utils/ApiRespons.js"
-import {VerifyJWT} from "../middlewares/auth.middleware.js"
+
 
 const generateAccessTokenandRefreshToken =  async(userId)=>{
 
@@ -114,12 +114,12 @@ const loginUser = asynchandler(async(req,res)=> {
 
     const {Username,email,password}= req.body 
 
-    if (!Username || !email) {
+    if (!(Username || email)) {
             throw new ApiError(404, "Username or email required");
     }
 
     const user = await User.findOne(
-        $or[{Username}, {email}]
+       { $or: [{ Username }, { email }] }
     )
 
     if (!user) {
@@ -132,7 +132,7 @@ const loginUser = asynchandler(async(req,res)=> {
         throw new ApiError(401,"Wrong User Credentials");
     }
 
-   const{accessToken,refreshToken}=  generateAccessTokenandRefreshToken(user._id)
+   const{accessToken,refreshToken}=  await generateAccessTokenandRefreshToken(user._id)
 
    const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -149,10 +149,11 @@ const loginUser = asynchandler(async(req,res)=> {
     .cookie("refreshToken",refreshToken, options)
     .json(
         new ApiResponse(200,
+            "user logged in successfully",
         {
             user: loggedInUser,accessToken,refreshToken
         },
-         "user logged in successfully",)
+         )
     )
 
 
@@ -178,8 +179,8 @@ const logoutUser = asynchandler(async(req,res)=>{
 
    return res
    .status(200)
-   .clearCookie("accessToken", accessToken)
-   .clearCookie("refreshToken", refreshToken)
+   .clearCookie("accessToken", options)
+   .clearCookie("refreshToken", options)
    .json(new ApiResponse(200, "User Logged out successfully "))
 })
 
