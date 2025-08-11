@@ -139,7 +139,7 @@ const loginUser = asynchandler(async(req,res)=> {
    )
 
    const options={
-    httpsOnly : true,
+    httpOnly : true,
     secure: true
    }
 
@@ -173,7 +173,7 @@ const logoutUser = asynchandler(async(req,res)=>{
 
     const options=
     {
-    httpsOnly : true,
+    httpOnly : true,
     secure: true
    }
 
