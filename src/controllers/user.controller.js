@@ -34,7 +34,7 @@ const registerUser =  asynchandler(async(req,res)=>{
     // remove password and refresh token field from response
     // check for user creation
     // return res
-   const {fullName , email ,Username, password} = req.body
+   const {fullName , email ,username, password} = req.body
     // console.log(req.body);
     
 
@@ -45,14 +45,14 @@ const registerUser =  asynchandler(async(req,res)=>{
         throw new ApiError(400,"All Fields are requrired")
     } else if  (email ==="") {
         throw new ApiError(400,"All Fields are requrired")
-    } else if(Username==="") {
+    } else if(username==="") {
         throw new ApiError(400,"All Fields are requrired")
     }else if(password==="") {
         throw new ApiError(400,"All Fields are requrired")
     }
 
    const existingUser = await User.findOne({
-    $or:[{ Username }, {email}]
+    $or:[{ username }, {email}]
    })
 
    if (existingUser){
@@ -79,7 +79,7 @@ const registerUser =  asynchandler(async(req,res)=>{
         avatar: avatar.url,
         coverImage : coverImage.url || "",
         email,
-        Username: Username.toLowerCase(),
+        username: username.toLowerCase(),
         password
     })
 
@@ -110,14 +110,14 @@ const loginUser = asynchandler(async(req,res)=> {
     //then create a access token from the refresh token and give it the user 
     //then route the user back to the homepage.
 
-    const {Username,email,password}= req.body 
+    const {username,email,password}= req.body 
 
-    if (!(Username || email)) {
+    if (!(username || email)) {
             throw new ApiError(404, "Username or email required");
     }
 
     const user = await User.findOne(
-       { $or: [{ Username }, { email }] }
+       { $or: [{ username }, { email }] }
     )
 
     if (!user) {
@@ -325,6 +325,82 @@ const updateUsercoverImage = asynchandler(async(req,res)=>{
         new ApiResponse(200,user,"cover Image  successfully updated")
     )
 })
+
+
+const getUserChannelProfile= asynchandler(async(req,res)=>{
+    const {username} = req.params
+
+    if (!username?.trim()) {
+        throw new ApiError(400,"Username required")
+    }
+
+    const channel = await User.aggregate([
+        {
+            $match:{
+                username:username?.toLowerCase()
+            }
+        },
+        {
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"channel",
+                as:"subscribers"
+            }
+        },
+        {
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"subscriber",
+                as:"subscribed"
+            }
+        },
+        {
+            $addFields:{
+                subscribersCount:{
+                    $size:"$subscribers"
+                },
+                channelsSubscriberdToCount:{
+                    $size:"$subscribed"
+                },
+                isSubscribed:{
+                    $cond:{
+                        if:{$in:[req.user?._id, "$subscribers.subscriber"]},
+                        then:true,
+                        else:false
+                    }
+                }
+            }
+        },
+        {
+            $project:{
+                username:1,
+                email:1,
+                subscribersCount:1,
+                channelsSubscriberdToCount:1,
+                coverImage:1,
+                avatar:1
+
+            }
+        }
+        
+    ])
+
+    if (!channel.length) {
+        throw new ApiError(404, "Channel does not exist")
+    }
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            data={channel:[channel,0]},
+            "User data Successfully fetched")
+    )
+})
+
+
 export {
     registerUser,
     loginUser,
@@ -334,5 +410,6 @@ export {
     getCurrentUser,
     UpdateAccountDetails,
     updateUsercoverImage,
-    updateUserAvatar
+    updateUserAvatar,
+    getUserChannelProfile
 }
