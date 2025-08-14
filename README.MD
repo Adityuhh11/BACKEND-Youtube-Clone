@@ -186,5 +186,5 @@ Please follow the repo’s code style and include tests for new functionality.
 Created by **Aditya**
 
 - Email: `saipremaditya@gmail.com`  
-- GitHub: `github.com/<your-username>`
+- GitHub: `github.com/Adityuhh11/`
 
