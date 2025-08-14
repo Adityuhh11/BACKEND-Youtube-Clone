@@ -182,7 +182,7 @@ const logoutUser = asynchandler(async(req,res)=>{
 })
 
 const refreshAccessToken=  asynchandler(async (req,res)=>{
-    const incomingRefreshToken = res.cookies.refreshToken || res.body.refreshToken
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
     if (!incomingRefreshToken) {
         throw new ApiError(401, "Invalid RefreshToken")    
@@ -326,7 +326,6 @@ const updateUsercoverImage = asynchandler(async(req,res)=>{
     )
 })
 
-
 const getUserChannelProfile= asynchandler(async(req,res)=>{
     const {username} = req.params
 
@@ -395,8 +394,53 @@ const getUserChannelProfile= asynchandler(async(req,res)=>{
     .json(
         new ApiResponse(
             200,
-            data={channel:[channel,0]},
+            data={channel:channel[0]},
             "User data Successfully fetched")
+    )
+})
+
+const getWatchHistory= asynchandler(async (req,res)=>{
+    const watchHistory = User.aggregate [
+        {
+            $match:{
+                _id: ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup:{
+                from:"videos",
+                localField:watchHistory,
+                foreignField:_id,
+                as:"watchHistory",
+                pipeline: [
+                    {
+                        $lookup:{
+                            from:"users",
+                            localField:owner,
+                            foreignField:_id,
+                            as:"owner",
+                            pipeline: [
+                                {
+                                    $project:
+                                    {
+                                        fullName:1,
+                                        username:1,
+                                        avatar:1,
+                                    }
+                                } 
+                            ]
+                        },
+                        $addFields:{
+                         $first:"$owner[0]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+
+    return res.status(200).json(
+        new ApiResponse(200,User[0].watchHistory,"succesfully found the watch history")
     )
 })
 
@@ -411,5 +455,6 @@ export {
     UpdateAccountDetails,
     updateUsercoverImage,
     updateUserAvatar,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 }
