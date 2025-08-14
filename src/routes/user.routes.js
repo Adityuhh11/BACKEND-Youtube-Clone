@@ -8,7 +8,9 @@ import {
     getCurrentUser,
     UpdateAccountDetails,
     updateUsercoverImage,
-    updateUserAvatar
+    updateUserAvatar,
+    getUserChannelProfile,
+    getWatchHistory
     } from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 const router =  Router()
@@ -36,17 +38,19 @@ router.route("/login").post(loginUser)
 //secure route
 router.route("/logout").post(VerifyJWT, logoutUser)
 router.route("/refreshToken").post(refreshAccessToken)
-router.route("/changePassword").post(VerifyJWT,changeUserPassword)
+router.route("/changepassword").post(VerifyJWT,changeUserPassword)
 router.route("/user").get(VerifyJWT,getCurrentUser)
-router.route("/updateDetails").post(VerifyJWT, UpdateAccountDetails)
-router.route("/update/Avatar").post(VerifyJWT,upload.fields([
+router.route("/user/watchhistory").get(VerifyJWT,getWatchHistory)
+router.route("/c/:username").get(VerifyJWT,getUserChannelProfile)
+router.route("/updateDetails").patch(VerifyJWT, UpdateAccountDetails)
+router.route("/update/Avatar").patch(VerifyJWT,upload.fields([
     {
         name:"avatar",
         maxCount:1
     } 
 ]), 
     updateUserAvatar)
-router.route("/update/coverImage").post(VerifyJWT,
+router.route("/update/coverImage").patch(VerifyJWT,
     upload.fields([
     {
         name:"coverImage",
