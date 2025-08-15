@@ -43,21 +43,7 @@ router.route("/user").get(VerifyJWT,getCurrentUser)
 router.route("/user/watchhistory").get(VerifyJWT,getWatchHistory)
 router.route("/c/:username").get(VerifyJWT,getUserChannelProfile)
 router.route("/updateDetails").patch(VerifyJWT, UpdateAccountDetails)
-router.route("/update/Avatar").patch(VerifyJWT,upload.fields([
-    {
-        name:"avatar",
-        maxCount:1
-    } 
-]), 
-    updateUserAvatar)
-router.route("/update/coverImage").patch(VerifyJWT,
-    upload.fields([
-    {
-        name:"coverImage",
-        maxCount:1
-    } 
-]),
-     updateUsercoverImage)
-
+router.route("/update/Avatar").patch(VerifyJWT,upload.single("avatar"),updateUserAvatar)
+router.route("/update/Avatar").patch(VerifyJWT,upload.single("coverImage"),updateUsercoverImage)
 
 export default router
