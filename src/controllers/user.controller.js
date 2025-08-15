@@ -4,6 +4,8 @@ import { User } from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/clouddinary.js"
 import {ApiResponse} from "../utils/ApiRespons.js"
 import jwt from "jsonwebtoken"
+import { deleteCloudinaryFile } from "../utils/deleteCloydinary.js";
+
 
 
 const generateAccessTokenandRefreshToken =  async(userId)=>{
@@ -77,7 +79,9 @@ const registerUser =  asynchandler(async(req,res)=>{
     const user = await User.create({
         fullName, 
         avatar: avatar.url,
+        avatarPublicId:avatar.public_id,
         coverImage : coverImage.url || "",
+        coverImagePublicId:coverImage.public_id || "",
         email,
         username: username.toLowerCase(),
         password
@@ -279,24 +283,34 @@ const updateUserAvatar = asynchandler(async(req,res)=>{
     if (!AvatarLocalPath) {
         throw new ApiError(401,"Avatar File is missing")
     }
-    const avatar = await uploadOnCloudinary(AvatarLocalPath)
+    const user = await User.findById(req.user?._id)
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    }
 
-    if (!avatar.url) {
+    const newAvatar = await uploadOnCloudinary(AvatarLocalPath)
+
+    if (!newAvatar.url) {
         throw new ApiError(401,"Error while Uploading on avatar")
     }
 
-    const user = await User.findByIdAndUpdate(req.user?._id, {
+    if (user.avatarPublicId) {
+        await deleteCloudinaryFile(user.avatarPublicId)
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.user?._id, {
         $set:{
-            avatar:avatar.url
+            avatar:newAvatar.url,
+            avatarPublicId:newAvatar.public_id
         }
      },
-        {new:true}
+        {new:true }
     ).select("-password")
 
     return res
     .status(200)
     .json(
-        new ApiResponse(200,user,"Avatar image successfully updated")
+        new ApiResponse(200,updatedUser,"Avatar image successfully updated")
     )
 })
 
@@ -305,15 +319,23 @@ const updateUsercoverImage = asynchandler(async(req,res)=>{
     if (!CoverImageLocalPath) {
         throw new ApiError(401,"Cover Image File is missing")
     }
+     const user = await User.findById(req.user?._id)
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    }
     const coverImage = await uploadOnCloudinary(CoverImageLocalPath)
 
     if (!coverImage.url) {
         throw new ApiError(401,"Error while Uploading on cover Imgage")
     }
+    if (user.coverImagePublicId) {
+        await deleteCloudinaryFile(user.coverImagePublicId)
+    }
 
-    const user = await User.findByIdAndUpdate(req.user?._id, {
+    const updatedUser = await User.findByIdAndUpdate(req.user?._id, {
         $set:{
-            coverImage:coverImage.url
+            coverImage:coverImage.url,
+            coverImagePublicId:coverImage.public_id
         }
      },
         {new:true}
@@ -322,9 +344,10 @@ const updateUsercoverImage = asynchandler(async(req,res)=>{
     return res
     .status(200)
     .json(
-        new ApiResponse(200,user,"cover Image  successfully updated")
+        new ApiResponse(200,updatedUser,"cover Image  successfully updated")
     )
 })
+//think about merging avatar and cover image into one single utility function
 
 const getUserChannelProfile= asynchandler(async(req,res)=>{
     const {username} = req.params
