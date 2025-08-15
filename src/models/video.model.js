@@ -22,13 +22,12 @@ const videoSchema = new mongoose.Schema({
         required: true,
     },
     duration:{
-        String:Number,
+        type:Number,
         required:true,
     },
     views:{
         type:Number,
         default:0,
-        required:true,
     },
     isPublished :{
         type:Boolean,
