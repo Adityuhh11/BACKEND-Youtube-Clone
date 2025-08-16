@@ -18,5 +18,7 @@ import videoRoutes from './routes/video.routes.js'
 
 app.use("/api/v1/users", userRoutes)
 app.use("/api/v1/videos",videoRoutes)
+app.use("/api/v1/tweets",tweetRoutes)
+
 
 export {app}
