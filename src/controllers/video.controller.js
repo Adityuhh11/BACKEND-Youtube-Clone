@@ -4,11 +4,68 @@ import { uploadOnCloudinary } from "../utils/clouddinary.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiRespons.js";
 import { deleteCloudinaryFile } from "../utils/deleteCloydinary.js";
+import mongoose from "mongoose";
 
-// const getAllVideos = asyncHandler(async (req, res) => {
-//     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-//    
-// })
+const getAllVideos = asynchandler(async (req, res) => {
+    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+    const pipeline=[]
+    const match ={}
+    if (query) {
+            match.$or=[
+                {title :{$regex:query, $options:'i'}},
+                {description :{$regex:query, $options:'i'}}
+            ]
+    }
+
+    if(!userId){
+       throw new ApiError(400, "Invalid userId ");
+    }
+    match.owner = new mongoose.Types.ObjectId(userId);
+    match.isPublished = true;
+
+    if (Object.keys(match).length>0) {
+        pipeline.push({$match:match});
+    }
+
+    const sortStage = {};
+
+    if (sortBy && sortType) {
+        const validSortFields= ['views','createdAt', 'diuration'];
+        if (!validSortFields.includes(sortBy)) {
+        throw new ApiError(400, `Invalid sortBy field : ${sortBy}`);
+
+        }
+
+        if (sortType === 'asc') {
+            sortOder = 1;
+        }else{
+            sortOrder= -1
+        }
+
+        sortStage[sortBy] = sortOder
+        pipeline.push({$sort : sortStage});
+
+    }
+
+    pipeline.push({
+        $lookup: {
+            from: "users",
+            localField: "owner", 
+            foreignField: "_id",
+            as: "owner" 
+        }
+    });
+
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: parseInt(limit) });
+
+
+    const searchedVideos = await Video.aggregate(pipeline);
+    return res.status(200).json(new ApiResponse(200,searchedVideos,"sucessfully sorted"))
+    
+})
 
 const uploadVideo = asynchandler(async(req,res)=>{
     const {title,description} = req.body
@@ -217,5 +274,6 @@ export{
     updateVideodetails,
     updateVideothumbnail,
     deleteVideo,
-    togglePublishStatus
+    togglePublishStatus,
+    getAllVideos
 }
