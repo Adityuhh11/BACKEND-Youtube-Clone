@@ -20,7 +20,7 @@ const getAllVideos = asynchandler(async (req, res) => {
     if(!userId){
        throw new ApiError(400, "Invalid userId ");
     }
-    match.owner = new mongoose.Types.ObjectId(userId);
+    match.owner = ObjectId(userId);
     match.isPublished = true;
 
     if (Object.keys(match).length>0) {
