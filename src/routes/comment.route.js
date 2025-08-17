@@ -6,9 +6,10 @@ import { addComment,
     deleteComment,
     getVideoComments } from "../controllers/comment.controller.js";
 
-    router.route("/add-comment/:videoId").post(VerifyJWT,addComment)
-    router.route("/update-comment/:commentId").post(VerifyJWT,updateComment)
-    router.route("/delete-comment/:commentId").post(VerifyJWT,deleteComment)
-    router.route("/video-comment/:videoId").get(VerifyJWT,getVideoComments)
+    router.use(VerifyJWT)
+    router.route("/add-comment/:videoId").post(addComment)
+    router.route("/update-comment/:commentId").patch(updateComment)
+    router.route("/delete-comment/:commentId").delete(deleteComment)
+    router.route("/video-comment/:videoId").get(getVideoComments)
 
     export default router

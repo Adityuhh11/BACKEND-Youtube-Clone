@@ -19,14 +19,14 @@ const getVideoComments = asynchandler(async (req, res) => {
     const Allcomments= await Comment.aggregate([
         {
             $match:{
-                video:videoId
+                video:new mongoose.Types.ObjectId(videoId)
             }
         },
         {
             $lookup:{
                 from:"users",
-                localfield:"owner",
-                foreignfield:"_id",
+                localField:"owner",
+                foreignField:"_id",
                 as:"commentDetails"
             }
         },
@@ -100,14 +100,16 @@ const updateComment = asynchandler(async (req, res) => {
         throw new ApiError(402,"Unauthorized request")
     }
     const updatedComment = await Comment.findByIdAndUpdate(commentId,{
-        $set:{
+        $set:
+        {
             comment:newContent
         }
-    })
+     },
+        {new:true})
 
     return res
     .status(200)
-    .json(200,updatedComment,"Comment successfully updated")
+    .json(new ApiResponse(200,updatedComment,"Comment successfully updated"))
 
 
 })
@@ -126,7 +128,7 @@ const deleteComment = asynchandler(async (req, res) => {
 
     await Comment.findByIdAndDelete(commentId)
 
-    return res.status(200).json(200,{},"comment successfully deleted")
+    return res.status(200).json(new ApiResponse(200,{},"comment successfully deleted"))
 })
 
 export{
