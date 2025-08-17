@@ -20,4 +20,6 @@ const likeSchema = new Schema ({
     
 },{timestamps:true})
 
+likeSchema.plugin(mongooserAggregatePaginate);
+
 export const Like = mongoose.model("Like",likeSchema)

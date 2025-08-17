@@ -18,4 +18,7 @@ const subscriptionsSchema =new mongoose.Schema(
     }
 )
 
+subscriptionsSchema.plugin(mongooserAggregatePaginate);
+
+
 export const Subscription  = MongooseError.model("Subscription",subscriptionsSchema)

@@ -11,4 +11,7 @@ const tweetScehma = new Schema({
     }
 },{timestamps:true})
 
+tweetScehma.plugin(mongooserAggregatePaginate);
+
+
 export const Tweet = mongoose.model("Tweet",tweetScehma)
