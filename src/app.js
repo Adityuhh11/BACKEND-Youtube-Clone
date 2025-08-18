@@ -19,6 +19,7 @@ import tweetRoutes from '.routes/tweet.route.js'
 import subscriptionRoutes from '.routes/subscription.route.js'
 import commentRoutes from '.routes/comment.route.js'
 import likedRoutes from '.routes/like.route.js'
+import dashboardRoutes from '.routes/dashboard.route.js'
 
 
 app.use("/api/v1/users", userRoutes)
@@ -27,6 +28,8 @@ app.use("/api/v1/tweets",tweetRoutes)
 app.use("/api/v1/subscription",subscriptionRoutes)
 app.use("/api/v1/comments",commentRoutes)
 app.use("/api/v1/likes",likedRoutes)
+app.use("/api/v1/likes",dashboardRoutes)
+
 
 
 
