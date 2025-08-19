@@ -20,4 +20,7 @@ const playlistsSchema = new Schema({
     }
 },{timestamps:true})
 
+subscriptionsSchema.plugin(mongooserAggregatePaginate);
+
+
 export const Playlist = mongoose.model("Playlist",playlistsSchema)
