@@ -21,6 +21,7 @@ import commentRoutes from '.routes/comment.route.js'
 import likedRoutes from '.routes/like.route.js'
 import dashboardRoutes from '.routes/dashboard.route.js'
 import playlistRoutes from '.routes/playlist.js'
+import  healthcheckRouter from 'routes/healthcheck.js'
 
 
 app.use("/api/v1/users", userRoutes)
@@ -31,6 +32,8 @@ app.use("/api/v1/comments",commentRoutes)
 app.use("/api/v1/likes",likedRoutes)
 app.use("/api/v1/dashboard",dashboardRoutes)
 app.use("/api/v1/playlist",playlistRoutes)
+app.use("/api/v1/healthcheck",healthcheckRouter)
+
 
 
 
