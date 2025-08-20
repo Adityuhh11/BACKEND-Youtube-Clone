@@ -1,4 +1,6 @@
 import mongoose, {Schema} from "mongoose";
+import mongooseAggregatePaginate from "mongoose-paginate-v2"
+
 
 const likeSchema = new Schema ({
     comment:{
@@ -20,6 +22,6 @@ const likeSchema = new Schema ({
     
 },{timestamps:true})
 
-likeSchema.plugin(mongooserAggregatePaginate);
+likeSchema.plugin(mongooseAggregatePaginate);
 
 export const Like = mongoose.model("Like",likeSchema)

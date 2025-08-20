@@ -1,6 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import mongooseAggregatePaginate from "mongoose-paginate-v2"
+
 
 
 const userSchema =  new mongoose.Schema (
@@ -95,6 +97,8 @@ process.env.REFRESH_TOKEN_SECRET,
 )
 }
 
+
+userSchema.plugin(mongooseAggregatePaginate)
 
 export const User = mongoose.model("User", userSchema)
 

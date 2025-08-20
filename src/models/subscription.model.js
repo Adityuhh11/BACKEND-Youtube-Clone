@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-paginate-v2"
 
 const subscriptionsSchema =new mongoose.Schema(
     {
@@ -18,7 +19,7 @@ const subscriptionsSchema =new mongoose.Schema(
     }
 )
 
-subscriptionsSchema.plugin(mongooserAggregatePaginate);
+subscriptionsSchema.plugin(mongooseAggregatePaginate);
 
 
 export const Subscription  = MongooseError.model("Subscription",subscriptionsSchema)
