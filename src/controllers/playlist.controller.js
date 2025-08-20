@@ -3,6 +3,7 @@ import {Playlist} from "../models/playlist.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asynchandler} from "../utils/asynchandler.js"
+import { Video } from "../models/video.model.js"
 
 
 
@@ -26,6 +27,88 @@ const createPlaylist = asynchandler(async (req, res) => {
     }
 
     return res.stauts(201).json(new ApiResponse(201,playlist,"Playlist successfully created"))
+
+})
+
+const addVideoPlaylist = asynchandler(async(req,res)=>{
+    const {playlistId, videoId} =req.params
+    const userId = req.user?._id
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(401,"PlayList ID is not valid")
+    }
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(401,"video ID is not valid")
+    }
+
+    const playlist = await Playlist.findById(playlistId)
+    const videos = await Video.findById(videoId)
+
+    if (!playlist) {
+        throw new ApiError(404,"Playlist not found");
+    }
+
+    if (videos) {
+      throw new ApiError(404,"Video not found");
+    }
+
+    if (playlist.owner.toString() !== userId.toString()) {
+        throw new ApiError(403, "Forbidden: You are not the owner of this playlist");
+    }
+
+    if (playlist.video.includes(videoId)) {
+        throw new ApiError(403, "The video aldready exists in the Playlist");
+    }
+    
+    const updatedPlaylist = await Playlist.findByIdAndUpdate({
+        $push:{
+            video:videoId
+        }
+    },{new:true})
+
+    // playlist.video = videoId
+    // playlist.save()
+
+    return res.status(201).json(new ApiResponse(201,updatedPlaylist,"video successfuly added"))
+})
+
+const removeVideoFromPlaylist = asynchandler(async (req, res) => {
+
+    const {playlistId, videoId} = req.params
+    const userId = req.user?._id
+
+     if (!isValidObjectId(playlistId)) {
+        throw new ApiError(401,"PlayList ID is not valid")
+    }
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(401,"video ID is not valid")
+    }
+    
+    const playlist = await Playlist.findById(playlistId)
+    const videos = await Video.findById(videoId)
+
+    if (!playlist) {
+        throw new ApiError(404,"Playlist not found");
+    }
+
+    if (videos) {
+      throw new ApiError(404,"Video not found");
+    }
+
+    if (playlist.owner.toString() !== userId.toString()) {
+        throw new ApiError(403, "Forbidden: You are not the owner of this playlist");
+    }
+
+    const updatePlaylist = await Playlist.findByIdAndUpdate({
+        $pull:{
+            video:videoId
+        }
+
+    },{
+        new:true
+    })
+
+    return res.status(200).json(new ApiResponse(200,updatePlaylist,"Video Successfully deleted"))
 
 })
 
@@ -90,7 +173,7 @@ const updatePlaylist = asynchandler(async (req, res) => {
     if (!name || !description) {
         throw new ApiError(401,"Name or Description is required")
     }
-      
+    const userId = req.user?._id
     const playlist = await Playlist.findById(playlistId);
 
     if (!playlist) {
@@ -168,5 +251,7 @@ export{
     getUserPlaylists,
     createPlaylist,
     updatePlaylist,
-    deletePlaylist
+    deletePlaylist,
+    removeVideoFromPlaylist,
+    addVideoPlaylist
 }
