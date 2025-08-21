@@ -100,10 +100,10 @@ const uploadVideo = asynchandler(async(req,res)=>{
         videoPublic_id:video.public_id,
         thumbnail:thumbnail.url,
         thumbnailPublic_id:thumbnail.public_id,
-        duration:video.duration,
+        // duration:video.duration,
         owner: user_id,
         isPublished:true,
-
+        status:"proccessing"
     }
     )
 
@@ -115,7 +115,7 @@ const uploadVideo = asynchandler(async(req,res)=>{
         {
         Video_data
         },
-        "video uploaded successfully")
+        "video uploaded successfully, and video is Transcoding")
         
     )
 
