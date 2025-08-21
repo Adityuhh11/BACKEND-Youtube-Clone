@@ -1,7 +1,7 @@
 import {asynchandler} from "../utils/asynchandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiRespons.js"
-import { Comment } from "../models/Comment.js";
+import { Comment } from "../models/comments.model.js";
 import mongoose, {isValidObjectId} from "mongoose"
 
 

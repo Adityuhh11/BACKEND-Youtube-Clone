@@ -15,13 +15,13 @@ app.use(cookieParser())
 //importing routes
 import userRoutes from './routes/user.routes.js';
 import videoRoutes from './routes/video.routes.js';
-import tweetRoutes from '.routes/tweet.route.js'
-import subscriptionRoutes from '.routes/subscription.route.js'
-import commentRoutes from '.routes/comment.route.js'
-import likedRoutes from '.routes/like.route.js'
-import dashboardRoutes from '.routes/dashboard.route.js'
-import playlistRoutes from '.routes/playlist.js'
-import  healthcheckRouter from 'routes/healthcheck.js'
+import tweetRoutes from './routes/tweet.route.js'
+import subscriptionRoutes from './routes/subscription.route.js'
+import commentRoutes from './routes/comment.route.js'
+import likedRoutes from './routes/like.route.js'
+import dashboardRoutes from './routes/dashboard.route.js'
+import playlistRoutes from './routes/playlist.route.js'
+import healthcheckRouter from './routes/healthcheck.routes.js'
 
 
 app.use("/api/v1/users", userRoutes)
