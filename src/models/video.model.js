@@ -4,53 +4,65 @@ import mongooseAggregatePaginate from "mongoose-paginate-v2"
 
 
 const videoSchema = new mongoose.Schema({
-    videoFile:{
-        type :String,
-        required :true,
+    videoFile: {
+        type: String,
+        required: true,
     },
-    videoPublic_id:{
-        type:String,
-        required:true
+    transcoded_videos: [
+        {
+            url: { type: String, required: true },
+            // format: { type: String, required: true },
+            resolution: { type: String },
+            bitrate: { type: Number },
+            size: { type: Number }
+        },
+        {
+            duration:{type:String}
+        }
+    ],
+    videoPublic_id: {
+        type: String,
+        required: true
     },
-    thumbnail:{
-        type :String,
-        required :true,
+    thumbnail: {
+        type: String,
+        required: true,
     },
-    thumbnailPublic_id:{
-         type :String,
-        required :true,
+    thumbnailPublic_id: {
+        type: String,
+        required: true,
     },
-    title:{
-        type : String,
+    title: {
+        type: String,
         required: true,
         index: true
     },
-    description:{
-        type : String,
+    description: {
+        type: String,
         required: true,
     },
-    duration:{
-        type:Number,
-        required:true,
+    duration: {
+        type: Number,
+        required: true,
     },
-    views:{
-        type:Number,
-        default:0,
+    views: {
+        type: Number,
+        default: 0,
     },
-    isPublished :{
-        type:Boolean,
-        default:true,
-        required:true
+    isPublished: {
+        type: Boolean,
+        default: true,
+        required: true
     },
-    owner:{
-        type:Schema.Types.ObjectId,
-        ref : "User",
-        required:true,
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     },
-    status:{
-        type:String,
+    status: {
+        type: String,
     }
-},{timestamps:true})
+}, { timestamps: true })
 
 videoSchema.plugin(mongooseAggregatePaginate);
 
