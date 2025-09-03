@@ -4,7 +4,9 @@ import { uploadOnCloudinary } from "../utils/clouddinary.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiRespons.js";
 import { deleteCloudinaryFile } from "../utils/deleteCloydinary.js";
+import videoQueue from "../queues/video.queue.js";
 import mongoose from "mongoose";
+import { tryCatch } from "bullmq";
 
 const getAllVideos = asynchandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
@@ -92,7 +94,7 @@ const uploadVideo = asynchandler(async(req,res)=>{
      if (!thumbnail.url) {
         throw new ApiError(501, "Error uploading video")
     }
-
+    
     const Video_data = await Video.create({
         title:title,
         description:description,
@@ -106,6 +108,13 @@ const uploadVideo = asynchandler(async(req,res)=>{
         status:"proccessing"
     }
     )
+    try {
+        await videoQueue.add("transcodeVideo", { videoId: Video_data._id.toString() });
+    } catch (error) {
+        console.error("Error adding job to queue:", error);
+        await Video.findByIdAndUpdate(Video_data._id, { status: "failed" });
+        throw new ApiError(500, "Video uploaded but could not be added to the processing queue.");
+    }
 
     return res
     .status(200)
@@ -118,8 +127,7 @@ const uploadVideo = asynchandler(async(req,res)=>{
         "video uploaded successfully, and video is Transcoding")
         
     )
-
-
+    
 })
 
 const getVideoById = asynchandler(async (req, res) => {
@@ -238,7 +246,6 @@ return res
 .json(new ApiResponse(200,null,"Successfully deleted"))
 })
 
-
 const togglePublishStatus = asynchandler(async (req, res) => {
     const { videoId } = req.params
     
@@ -268,6 +275,7 @@ const togglePublishStatus = asynchandler(async (req, res) => {
     return res.status(200)
     .json(new ApiResponse(200,updatedVideo,message))
 })
+
 export{
     uploadVideo,
     getVideoById,
