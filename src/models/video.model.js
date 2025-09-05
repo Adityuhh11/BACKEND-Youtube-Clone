@@ -9,16 +9,14 @@ const videoSchema = new mongoose.Schema({
         required: true,
     },
     transcoded_videos: [
-        {
-            url: { type: String, required: true },
-            // format: { type: String, required: true },
-            resolution: { type: String },
-            bitrate: { type: Number },
-            size: { type: Number }
-        },
-        {
-            duration:{type:String}
-        }
+    {
+        url: { type: String, required: true },
+        publicId: { type: String, required: true },
+        resolution: { type: String, required: true },
+        bitrate: { type: Number },
+        size: { type: Number }, 
+        duration: { type: Number }, 
+    }
     ],
     videoPublic_id: {
         type: String,
