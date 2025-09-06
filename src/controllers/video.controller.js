@@ -232,6 +232,9 @@ const deleteVideo = asynchandler(async (req, res) => {
    if (!video) {
         throw new ApiError(402,"Video not found")
     }
+    if (video.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(403, "You don't have permission to delete this video.");
+    }
 
     if (video.thumbnailPublic_id) {
         await deleteCloudinaryFile(video.thumbnailPublic_id)
@@ -239,6 +242,12 @@ const deleteVideo = asynchandler(async (req, res) => {
     if (video.videoPublic_id) {
         await deleteCloudinaryFile(video.videoPublic_id)
     }
+    if (video.transcoded_videos && video.transcoded_videos.length > 0) {
+            for (const transcodedVideo of video.transcoded_videos) {
+                // Access the publicId for each transcoded video object
+                await deleteCloudinaryFile(transcodedVideo.publicId);
+            }
+        }
 
     await Video.findByIdAndDelete(videoId)
 return res
