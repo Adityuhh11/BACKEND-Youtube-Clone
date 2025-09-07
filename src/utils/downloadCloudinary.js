@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import fs from "fs";
-import path from "path"; // Import the 'path' module
 
 const downloadFile = async(url, destinationPath) => {
     try {

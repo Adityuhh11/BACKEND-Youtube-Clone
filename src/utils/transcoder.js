@@ -1,4 +1,3 @@
-// src/utils/transcoder.js
 
 import Ffmpeg from "fluent-ffmpeg";
 import { uploadOnCloudinary } from "./cloudinary.js";
