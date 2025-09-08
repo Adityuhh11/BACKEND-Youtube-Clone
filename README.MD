@@ -8,6 +8,7 @@
 - ✅ JWT-based authentication with access + refresh tokens  
 - ✅ Secure password hashing with `bcrypt`  
 - ✅ Cloud media storage (Cloudinary) with `multer` for file uploads  
+- ✅ Video transcoding with background workers for optimized streaming
 - ✅ RESTful API with consistent response patterns  
 - ✅ Comprehensive MongoDB models (Users, Videos, Comments, Subscriptions, etc.)  
 - ✅ Pagination support for large datasets
@@ -41,6 +42,7 @@
 
 ### Video Management
 - Upload and stream videos
+- Background video transcoding to multiple resolutions (e.g., 360p, 720p, 1080p)
 - Video thumbnails and metadata
 - Video search and filtering
 - Video categorization and tags
@@ -75,7 +77,8 @@
 ### File Handling
 - **Uploads:** multer
 - **Cloud Storage:** Cloudinary
-- **File Processing:** Built-in streams
+- **Video Transcoding:** FFmpeg
+- **Background Jobs:** BullMQ, Redis
 
 ### Development
 - **Environment Management:** dotenv
@@ -158,6 +161,7 @@ Available npm scripts in the project:
 - `npm run format` - Format code using Prettier
 - `npm run lint` - Lint the codebase (ESLint configuration needed)
 - `npm test` - Run tests (test setup needed)
+- `npm run queue:listen` - Start the video transcoding queue listener
 
 ## API Endpoints
 
@@ -267,6 +271,12 @@ src/
 │   ├── playlist.model.js
 │   └── tweet.model.js
 │
+├── queues/               # Background job queues
+│   └── video.queue.js
+│
+├── workers/              # Background job workers
+│   └── videoTranscoder.js
+│
 ├── routes/               # API routes
 │   ├── user.routes.js
 │   ├── video.routes.js
@@ -278,7 +288,13 @@ src/
 │   └── healthcheck.routes.js
 │
 ├── utils/                # Utility functions
-│   └── constants.js
+│   ├── ApiError.js
+│   ├── ApiRespons.js
+│   ├── asynchandler.js
+│   ├── clouddinary.js
+│   ├── deleteCloydinary.js
+│   ├── downloadCloudinary.js
+│   └── transcoder.js
 │
 ├── app.js               # Express app configuration
 └── index.js             # Application entry point
