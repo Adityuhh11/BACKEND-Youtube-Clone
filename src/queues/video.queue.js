@@ -1,4 +1,3 @@
-import { createClient } from 'redis';
 import { Queue } from 'bullmq';
 
 
@@ -7,7 +6,7 @@ const connection = {
     password: process.env.REDIS_PASSWORD,
     socket: {
         host: process.env.REDIS_URI,
-        port: 16030
+        port: process.env.REDIS_PORT
     }
 }
 

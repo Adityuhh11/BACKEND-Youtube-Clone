@@ -37,12 +37,12 @@ const getAllVideos = asynchandler(async (req, res) => {
         }
 
         if (sortType === 'asc') {
-            sortOder = 1;
+            sortOrder = 1;
         }else{
             sortOrder= -1
         }
 
-        sortStage[sortBy] = sortOder
+        sortStage[sortBy] = sortOrder
         pipeline.push({$sort : sortStage});
 
     }
@@ -146,6 +146,28 @@ const getVideoById = asynchandler(async (req, res) => {
     )
 })
 
+const searchvideo = asynchandler(async(req, res)=>{
+    const searchQuery =  req.params.q
+
+    if (!searchQuery) {
+        throw new ApiError(400, "Search query is required.");
+    }
+
+    const foundvideos = await Video.find(
+        {
+            $text:{
+                $search: searchQuery
+            }
+        }
+    )
+    if(foundvideos.length() === 0)
+    {
+        return res.status(200).json(new ApiResponse(200,[],"Video not found"))
+    }
+        return res.status(200).json(new ApiResponse(200,foundvideos,"Video  found"))
+
+})
+
 const updateVideodetails = asynchandler(async (req, res) => {
     const { videoId } = req.params
      if (!videoId) {
@@ -204,7 +226,7 @@ const updateVideothumbnail = asynchandler (async(req,res)=>{
         throw new ApiError(500, "Error uploading video")
     }
     if(video.thumbnailPublic_id){
-        await deleteCloudinaryFile(Video.thumbnailPublic_id)
+        await deleteCloudinaryFile(video.thumbnailPublic_id)
     }
     const updatedVideo = await Video.findByIdAndUpdate(videoId,{
         $set:{
@@ -282,6 +304,7 @@ const togglePublishStatus = asynchandler(async (req, res) => {
     return res.status(200)
     .json(new ApiResponse(200,updatedVideo,message))
 })
+
 
 export{
     uploadVideo,
