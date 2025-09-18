@@ -1,17 +1,21 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { Queue } from 'bullmq';
 
+console.log("--- SANITY CHECK: video.queue.js IS RUNNING ---");
 
 const connection = {
-    username: 'default',
+    host: process.env.REDIS_HOST,
+    port: 16030, 
     password: process.env.REDIS_PASSWORD,
-    socket: {
-        host: process.env.REDIS_URI,
-        port: process.env.REDIS_PORT
-    }
 }
+// This will print the values you hardcoded above
+console.log(`--- CONNECTING WITH: Host='${connection.host}', Port=${connection.port} ---`);
 
+const videoQueue = new Queue("videoTranscodingQueue", { connection });
 
-const videoQueue = new Queue ("videoTranscodingQueue", {connection})
+videoQueue.on('error', err => {
+  console.error('--- BullMQ Queue Error ---:', err);
+});
 
-
-export default videoQueue
+export default videoQueue;

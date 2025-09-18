@@ -2,16 +2,19 @@
 
 > A full-featured backend for a YouTube-style application with user authentication, video management, and social features.
 
----
 
 ### Highlights
 - ✅ JWT-based authentication with access + refresh tokens  
 - ✅ Secure password hashing with `bcrypt`  
 - ✅ Cloud media storage (Cloudinary) with `multer` for file uploads  
 - ✅ Video transcoding with background workers for optimized streaming
+- ✅ **Advanced video search & indexing** with MongoDB text search
+- ✅ **Multi-resolution video support** with automatic transcoding
+- ✅ **Intelligent video filtering** by title, description, views, and date
 - ✅ RESTful API with consistent response patterns  
-- ✅ Comprehensive MongoDB models (Users, Videos, Comments, Subscriptions, etc.)  
-- ✅ Pagination support for large datasets
+- ✅ Comprehensive MongoDB models with optimized indexing
+- ✅ Advanced pagination with MongoDB aggregation pipelines
+- ✅ Background job processing with BullMQ and Redis
 - ✅ Middleware for authentication and request validation
 - ✅ Health check endpoint for monitoring
 
@@ -41,11 +44,14 @@
 - Protected routes with JWT verification
 
 ### Video Management
-- Upload and stream videos
-- Background video transcoding to multiple resolutions (e.g., 360p, 720p, 1080p)
-- Video thumbnails and metadata
-- Video search and filtering
-- Video categorization and tags
+- **Smart Video Upload** with automatic file validation and processing
+- **Multi-Resolution Transcoding** - Automatic conversion to 360p, 720p, 1080p
+- **Advanced Search Engine** - Full-text search across titles and descriptions
+- **Intelligent Filtering** - Sort by views, upload date, duration, and relevance
+- **MongoDB Text Indexing** - Optimized search performance with compound indexes
+- **Video Analytics** - View counting, engagement metrics, and performance tracking
+- **Thumbnail Management** - Automatic thumbnail generation and cloud storage
+- **Publication Control** - Draft/published status with visibility management
 
 ### Social Features
 - User subscriptions and channel following
@@ -86,9 +92,12 @@
 - **Development Server:** nodemon
 
 ### API Features
-- **Pagination:** mongoose-paginate-v2
-- **CORS:** cors middleware
-- **Request Parsing:** express.json, express.urlencoded
+- **Advanced Pagination:** MongoDB aggregation pipelines with mongoose-paginate-v2
+- **Full-Text Search:** MongoDB text indexes for lightning-fast video discovery
+- **Smart Filtering:** Multi-criteria sorting and filtering capabilities
+- **Background Processing:** BullMQ with Redis for video transcoding queues
+- **CORS:** cors middleware with configurable origins
+- **Request Parsing:** express.json, express.urlencoded with file upload support
 
 ---
 
@@ -97,8 +106,10 @@
 ### Prerequisites
 - Node.js (v18 or higher recommended)
 - npm (comes with Node.js)
-- MongoDB instance (local or MongoDB Atlas)
+- MongoDB instance (local or MongoDB Atlas) with text search support
+- Redis server (for background job processing)
 - Cloudinary account (for media storage)
+- FFmpeg (for video transcoding - auto-installed with dependencies)
 
 ### Installation
 
@@ -145,6 +156,16 @@ REFRESH_TOKEN_SECRET=your_refresh_token_secret
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+
+# Redis Configuration (Required for video processing)
+REDIS_URI=redis://localhost:6379
+REDIS_PASSWORD=your_redis_password
+REDIS_PORT=6379
+
+# JWT Token Expiry
+ACCESS_TOKEN_EXPIRY=1d
+REFRESH_TOKEN_EXPIRY=10d
+
 ```
 
 > **Security Note:** Never commit the `.env` file. It's already included in `.gitignore`.
@@ -172,11 +193,16 @@ Available npm scripts in the project:
 - `GET /api/v1/users/me` - Get current user profile
 
 ### Videos
-- `GET /api/v1/videos` - Get all videos (with pagination)
-- `POST /api/v1/videos` - Upload a new video
-- `GET /api/v1/videos/:videoId` - Get video details
-- `PATCH /api/v1/videos/:videoId` - Update video details
-- `DELETE /api/v1/videos/:videoId` - Delete a video
+- `GET /api/v1/videos/getVideos` - Get all videos with advanced search & filtering
+  - Query params: `page`, `limit`, `query`, `sortBy`, `sortType`, `userId`
+  - Supports full-text search across titles and descriptions
+  - Sort by: views, createdAt, duration (asc/desc)
+- `POST /api/v1/videos/videoupload` - Upload a new video with thumbnail
+- `GET /api/v1/videos/Video/:videoId` - Get video details with owner info
+- `POST /api/v1/videos/updateVideo/:videoId` - Update video title and description
+- `POST /api/v1/videos/updateThumbnail/:videoId` - Update video thumbnail
+- `POST /api/v1/videos/updatePublication/:videoId` - Toggle publication status
+- `POST /api/v1/videos/deleteVideo/:videoId` - Delete video and associated files
 
 ### Comments
 - `GET /api/v1/comments/video/:videoId` - Get comments for a video
@@ -209,6 +235,37 @@ Available npm scripts in the project:
 
 ### Health Check
 - `GET /api/v1/healthcheck` - API health status
+
+---
+
+## 🔍 Advanced Search & Indexing Features
+
+### MongoDB Text Search
+- **Full-text indexing** on video titles and descriptions
+- **Case-insensitive search** with regex pattern matching
+- **Compound indexes** for optimized query performance
+- **Search relevance scoring** for better result ranking
+
+### Smart Video Filtering
+```javascript
+// Example API call with search and filtering
+GET /api/v1/videos/getVideos?query=javascript&sortBy=views&sortType=desc&page=1&limit=10
+```
+
+**Supported Query Parameters:**
+- `query` - Search term for title/description matching
+- `sortBy` - Sort field: `views`, `createdAt`, `duration`
+- `sortType` - Sort order: `asc` or `desc`
+- `page` - Page number for pagination
+- `limit` - Results per page (max 50)
+- `userId` - Filter by specific user's videos
+
+
+### Search Performance Features
+- **Aggregation pipelines** for complex queries
+- **Pagination optimization** with MongoDB skip/limit
+- **Index hints** for query optimization
+- **Result caching** ready (Redis integration available)
 
 ---
 
