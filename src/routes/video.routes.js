@@ -5,7 +5,8 @@ import {
     updateVideothumbnail,
     deleteVideo,
     togglePublishStatus,
-    getAllVideos } from "../controllers/video.controller.js";
+    getAllVideos,
+    searchvideo } from "../controllers/video.controller.js";
 import { upload, videoUpload } from "../middlewares/multer.middleware.js";
 import { VerifyJWT } from "../middlewares/auth.middleware.js";
 import { Router } from "express";
@@ -29,6 +30,7 @@ router.route("/updateThumbnail/:videoId").post(VerifyJWT,upload.single("thumbnai
 router.route("/deleteVideo/:videoId").post(VerifyJWT,deleteVideo)
 router.route("/updatePublication/:videoId").post(VerifyJWT,togglePublishStatus)
 router.route("/getVideos").get(VerifyJWT,getAllVideos)
+router.route("/searchvideo/?query=text&sort=desc").get(searchvideo)
 
 
 export default router

@@ -313,5 +313,6 @@ export{
     updateVideothumbnail,
     deleteVideo,
     togglePublishStatus,
-    getAllVideos
+    getAllVideos,
+    searchvideo
 }
